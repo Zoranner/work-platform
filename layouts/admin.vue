@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-100">
     <!-- 顶部导航栏 -->
     <AdminHeader />
 
@@ -9,8 +9,12 @@
       <AdminSidebar />
 
       <!-- 主内容区 -->
-      <main class="flex-1 ml-64 p-6">
-        <slot />
+      <main class="flex-1 ml-64">
+        <div class="py-6 px-4 sm:px-6 lg:px-8">
+          <div class="max-w-7xl mx-auto">
+            <slot />
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -19,10 +23,4 @@
 <script setup lang="ts">
 import AdminHeader from '~/components/layout/AdminHeader.vue'
 import AdminSidebar from '~/components/layout/AdminSidebar.vue'
-</script>
-
-<style scoped>
-.min-h-screen {
-  min-height: 100vh;
-}
-</style> 
+</script> 

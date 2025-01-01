@@ -1,253 +1,217 @@
 <template>
+  <PageContainer>
+    <!-- 页面标题和操作按钮 -->
+    <PageHeader
+      title="设备管理"
+      :show-add-button="true"
+      add-button-text="新建设备"
+      @add="showAddDialog = true"
+    />
+
+    <!-- 搜索和筛选区域 -->
+    <SearchSection @search="handleSearch" @reset="handleReset">
   <div>
-    <!-- 搜索表单 -->
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">设备编号</label>
+        <label class="block text-sm font-medium text-gray-700">设备编号</label>
           <input
             type="text"
-            v-model="searchForm.deviceNo"
-            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-            placeholder="请输入设备编号"
-          >
+          v-model="searchForm.deviceNumber"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+        />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">设备名称</label>
+        <label class="block text-sm font-medium text-gray-700">设备名称</label>
           <input
             type="text"
             v-model="searchForm.name"
-            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-            placeholder="请输入设备名称"
-          >
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+        />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">设备类型</label>
+        <label class="block text-sm font-medium text-gray-700">设备类型</label>
           <select
             v-model="searchForm.type"
-            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
           >
             <option value="">全部</option>
-            <option v-for="option in typeOptions" :key="option.value" :value="option.value">
-              {{ option.label }}
-            </option>
+          <option value="computer">计算机</option>
+          <option value="printer">打印机</option>
+          <option value="network">网络设备</option>
+          <option value="other">其他</option>
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">设备状态</label>
+        <label class="block text-sm font-medium text-gray-700">状态</label>
           <select
             v-model="searchForm.status"
-            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
           >
             <option value="">全部</option>
-            <option v-for="option in statusOptions" :key="option.value" :value="option.value">
-              {{ option.label }}
-            </option>
+          <option value="in_use">使用中</option>
+          <option value="idle">闲置</option>
+          <option value="maintenance">维修中</option>
+          <option value="scrapped">已报废</option>
           </select>
-        </div>
       </div>
-      <div class="mt-4 flex justify-end space-x-2">
-        <Button type="primary" @click="handleSearch">搜索</Button>
-        <Button @click="handleReset">重置</Button>
-      </div>
+    </SearchSection>
+
+    <!-- 设备列表 -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">设备编号</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">设备名称</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">设备类型</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">型号</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">购入日期</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr v-for="device in deviceList" :key="device.id">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ device.deviceNumber }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ device.name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ getTypeText(device.type) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ device.model }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ device.purchaseDate }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <StatusTag :status="getStatusType(device.status)" :text="getStatusText(device.status)" />
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <TableActions
+                size="sm"
+                :actions="[
+                  {
+                    key: 'edit',
+                    text: '编辑',
+                    type: 'primary',
+                    onClick: () => handleEdit(device)
+                  },
+                  {
+                    key: 'delete',
+                    text: '删除',
+                    type: 'danger',
+                    onClick: () => handleDelete(device)
+                  }
+                ]"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <!-- 表格 -->
-    <div class="bg-white rounded-lg shadow-sm">
-      <div class="p-6 border-b border-gray-200">
-        <div class="flex justify-between items-center">
-          <h3 class="text-lg font-medium text-gray-900">设备列表</h3>
-          <Button type="primary" @click="openDialog()">新增设备</Button>
-        </div>
-      </div>
-      <div class="overflow-x-auto">
-        <Table :columns="columns" :data="tableData" />
-      </div>
+    <!-- 分页 -->
+    <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+      <Pagination
+        :current-page="currentPage"
+        :total="total"
+        :page-size="pageSize"
+        @update:current-page="handlePageChange"
+      />
     </div>
+  </PageContainer>
 
     <!-- 新增/编辑对话框 -->
-    <Modal v-model:visible="dialogVisible" :title="dialogTitle">
+  <Modal v-model:visible="showAddDialog" :title="editingDevice ? '编辑设备' : '新建设备'">
       <div class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">设备编号</label>
-          <input
-            type="text"
-            v-model="formData.deviceNo"
-            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+      <FormInput
+        v-model="deviceForm.deviceNumber"
+        label="设备编号"
             placeholder="请输入设备编号"
-            :disabled="!!editingRecord"
-          >
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">设备名称</label>
-          <input
-            type="text"
-            v-model="formData.name"
-            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+        :disabled="!!editingDevice"
+      />
+      <FormInput
+        v-model="deviceForm.name"
+        label="设备名称"
             placeholder="请输入设备名称"
-          >
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">设备类型</label>
-          <select
-            v-model="formData.type"
-            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-          >
-            <option v-for="option in typeOptions" :key="option.value" :value="option.value">
-              {{ option.label }}
-            </option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">型号</label>
-          <input
-            type="text"
-            v-model="formData.model"
-            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-            placeholder="请输入型号"
-          >
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">购入日期</label>
-          <input
+      />
+      <FormSelect
+        v-model="deviceForm.type"
+        label="设备类型"
+        :options="[
+          { label: '计算机', value: 'computer' },
+          { label: '打印机', value: 'printer' },
+          { label: '网络设备', value: 'network' },
+          { label: '其他', value: 'other' }
+        ]"
+      />
+      <FormInput
+        v-model="deviceForm.model"
+        label="型号"
+        placeholder="请输入设备型号"
+      />
+      <FormInput
             type="date"
-            v-model="formData.purchaseDate"
-            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-          >
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">状态</label>
-          <select
-            v-model="formData.status"
-            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-          >
-            <option v-for="option in statusOptions" :key="option.value" :value="option.value">
-              {{ option.label }}
-            </option>
-          </select>
-        </div>
+        v-model="deviceForm.purchaseDate"
+        label="购入日期"
+      />
+      <FormSelect
+        v-model="deviceForm.status"
+        label="状态"
+        :options="[
+          { label: '使用中', value: 'in_use' },
+          { label: '闲置', value: 'idle' },
+          { label: '维修中', value: 'maintenance' },
+          { label: '已报废', value: 'scrapped' }
+        ]"
+      />
       </div>
       <template #footer>
         <div class="flex justify-end space-x-3">
           <Button @click="closeDialog">取消</Button>
-          <Button type="primary" @click="handleSubmit">确定</Button>
+        <Button type="primary" @click="handleSave">确定</Button>
         </div>
       </template>
     </Modal>
+
+  <!-- 删除确认对话框 -->
+  <Modal v-model:visible="showDeleteDialog" title="确认删除">
+    <div class="mt-2">
+      <p class="text-sm text-gray-500">
+        确定要删除该设备吗？此操作无法撤销。
+      </p>
+    </div>
+    <template #footer>
+      <div class="flex justify-end space-x-3">
+        <Button @click="showDeleteDialog = false">取消</Button>
+        <Button type="danger" @click="handleConfirmDelete">删除</Button>
   </div>
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, h } from 'vue'
-import type { DeviceAsset } from '~/types'
+import { ref } from 'vue'
 import Button from '~/components/ui/Button.vue'
 import Table from '~/components/table/Table.vue'
 import StatusTag from '~/components/ui/StatusTag.vue'
 import Modal from '~/components/ui/Modal.vue'
+import FormInput from '~/components/ui/FormInput.vue'
+import FormSelect from '~/components/ui/FormSelect.vue'
+import Pagination from '~/components/ui/Pagination.vue'
+import TableActions from '~/components/table/TableActions.vue'
+import PageContainer from '~/components/page/PageContainer.vue'
+import PageHeader from '~/components/page/PageHeader.vue'
+import SearchSection from '~/components/page/SearchSection.vue'
 
 definePageMeta({
   middleware: ['auth'],
   layout: 'admin'
 })
 
-// 搜索表单数据
+// 搜索表单
 const searchForm = ref({
-  deviceNo: '',
+  deviceNumber: '',
   name: '',
   type: '',
   status: ''
 })
 
-// 表格数据
-const tableData = ref<DeviceAsset[]>([
-  {
-    id: 1,
-    deviceNo: 'DEV20230001',
-    name: '开发用笔记本',
-    type: 'computer',
-    model: 'ThinkPad X1 Carbon',
-    purchaseDate: '2023-01-01',
-    status: 'in_use',
-    createdAt: '2023-01-01',
-    updatedAt: '2023-01-01'
-  },
-  {
-    id: 2,
-    deviceNo: 'DEV20230002',
-    name: '办公室打印机',
-    type: 'printer',
-    model: 'HP LaserJet Pro',
-    purchaseDate: '2023-01-02',
-    status: 'in_use',
-    createdAt: '2023-01-02',
-    updatedAt: '2023-01-02'
-  }
-])
-
-// 设备类型选项
-const typeOptions = [
-  { label: '计算机', value: 'computer' },
-  { label: '打印机', value: 'printer' },
-  { label: '扫描仪', value: 'scanner' },
-  { label: '服务器', value: 'server' },
-  { label: '网络设备', value: 'network' },
-  { label: '其他', value: 'other' }
-]
-
-// 状态选项
-const statusOptions = [
-  { label: '使用中', value: 'in_use' },
-  { label: '闲置', value: 'idle' },
-  { label: '维修中', value: 'maintenance' },
-  { label: '已报废', value: 'scrapped' }
-]
-
-// 获取类型文本
-const getTypeText = (type: string) => {
-  return typeOptions.find(option => option.value === type)?.label || type
-}
-
-// 表格列定义
-const columns = [
-  { title: '设备编号', key: 'deviceNo' },
-  { title: '设备名称', key: 'name' },
-  { 
-    title: '设备类型', 
-    key: 'type',
-    render: (record: DeviceAsset) => getTypeText(record.type)
-  },
-  { title: '型号', key: 'model' },
-  { title: '购入日期', key: 'purchaseDate' },
-  { 
-    title: '状态', 
-    key: 'status',
-    render: (record: DeviceAsset) => h(StatusTag, { status: record.status })
-  },
-  { 
-    title: '操作', 
-    key: 'action', 
-    width: 200,
-    render: (record: DeviceAsset) => h('div', { class: 'space-x-2' }, [
-      h(Button, { 
-        size: 'sm', 
-        onClick: () => openDialog(record) 
-      }, () => '编辑'),
-      h(Button, { 
-        size: 'sm', 
-        type: 'danger', 
-        onClick: () => handleDelete(record) 
-      }, () => '删除')
-    ])
-  }
-]
-
-// 新增/编辑对话框
-const dialogVisible = ref(false)
-const editingRecord = ref<DeviceAsset | null>(null)
-const dialogTitle = computed(() => editingRecord.value ? '编辑设备' : '新增设备')
-
-const formData = ref({
-  deviceNo: '',
+// 设备表单
+const deviceForm = ref({
+  deviceNumber: '',
   name: '',
   type: 'computer',
   model: '',
@@ -255,31 +219,141 @@ const formData = ref({
   status: 'in_use'
 })
 
-// 打开对话框
-const openDialog = (record: DeviceAsset | null = null) => {
-  editingRecord.value = record
-  if (record) {
-    const { id, createdAt, updatedAt, ...rest } = record
-    formData.value = { ...rest }
-  } else {
-    formData.value = {
-      deviceNo: '',
-      name: '',
-      type: 'computer',
-      model: '',
-      purchaseDate: '',
-      status: 'in_use'
-    }
+// 列表数据
+const deviceList = ref([
+  {
+    id: 1,
+    deviceNumber: 'DEV001',
+    name: '办公电脑',
+    type: 'computer',
+    model: 'ThinkPad T490',
+    purchaseDate: '2023-01-01',
+    status: 'in_use'
+  },
+  {
+    id: 2,
+    deviceNumber: 'DEV002',
+    name: '打印机',
+    type: 'printer',
+    model: 'HP LaserJet Pro',
+    purchaseDate: '2023-02-15',
+    status: 'maintenance'
   }
-  dialogVisible.value = true
+])
+
+// 分页相关
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(20)
+
+// 对话框控制
+const showAddDialog = ref(false)
+const showDeleteDialog = ref(false)
+const editingDevice = ref<any>(null)
+const deletingDevice = ref<any>(null)
+
+// 获取类型文本
+const getTypeText = (type: string) => {
+  const typeMap: Record<string, string> = {
+    computer: '计算机',
+    printer: '打印机',
+    network: '网络设备',
+    other: '其他'
+  }
+  return typeMap[type] || type
+}
+
+// 获取状态类型
+const getStatusType = (status: string) => {
+  const statusMap: Record<string, 'normal' | 'warning' | 'success' | 'error'> = {
+    in_use: 'success',
+    idle: 'warning',
+    maintenance: 'normal',
+    scrapped: 'error'
+  }
+  return statusMap[status] || 'normal'
+}
+
+// 获取状态文本
+const getStatusText = (status: string) => {
+  const statusMap: Record<string, string> = {
+    in_use: '使用中',
+    idle: '闲置',
+    maintenance: '维修中',
+    scrapped: '已报废'
+  }
+  return statusMap[status] || status
+}
+
+// 搜索
+const handleSearch = () => {
+  // TODO: 实现搜索逻辑
+  console.log('搜索条件:', searchForm.value)
+}
+
+// 重置搜索
+const handleReset = () => {
+  searchForm.value = {
+    deviceNumber: '',
+  name: '',
+    type: '',
+    status: ''
+  }
+}
+
+// 编辑设备
+const handleEdit = (device: any) => {
+  editingDevice.value = device
+  deviceForm.value = { ...device }
+  showAddDialog.value = true
+}
+
+// 删除设备
+const handleDelete = (device: any) => {
+  deletingDevice.value = device
+  showDeleteDialog.value = true
+}
+
+// 确认删除
+const handleConfirmDelete = () => {
+  if (deletingDevice.value) {
+    // TODO: 实现删除逻辑
+    console.log('删除设备:', deletingDevice.value)
+    deviceList.value = deviceList.value.filter(item => item.id !== deletingDevice.value.id)
+    showDeleteDialog.value = false
+    deletingDevice.value = null
+  }
+}
+
+// 保存设备
+const handleSave = () => {
+  // TODO: 实现保存逻辑
+  if (editingDevice.value) {
+    // 编辑模式
+    const index = deviceList.value.findIndex(item => item.id === editingDevice.value.id)
+    if (index !== -1) {
+      deviceList.value[index] = {
+        ...deviceList.value[index],
+        ...deviceForm.value
+      }
+    }
+  } else {
+    // 新增模式
+    const newDevice = {
+      id: Date.now(),
+      ...deviceForm.value
+    }
+    deviceList.value.unshift(newDevice)
+  }
+  closeDialog()
 }
 
 // 关闭对话框
 const closeDialog = () => {
-  dialogVisible.value = false
-  editingRecord.value = null
-  formData.value = {
-    deviceNo: '',
+  showAddDialog.value = false
+  editingDevice.value = null
+  deviceForm.value = {
+    deviceNumber: '',
     name: '',
     type: 'computer',
     model: '',
@@ -288,32 +362,9 @@ const closeDialog = () => {
   }
 }
 
-// 提交表单
-const handleSubmit = () => {
-  // TODO: 实现表单提交逻辑
-  console.log('提交表单', formData.value)
-  closeDialog()
-}
-
-// 删除记录
-const handleDelete = (record: DeviceAsset) => {
-  // TODO: 实现删除逻辑
-  console.log('删除记录', record)
-}
-
-// 搜索
-const handleSearch = () => {
-  // TODO: 实现搜索逻辑
-  console.log('搜索', searchForm.value)
-}
-
-// 重置搜索
-const handleReset = () => {
-  searchForm.value = {
-    deviceNo: '',
-    name: '',
-    type: '',
-    status: ''
-  }
+// 分页操作
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  // TODO: 实现分页加载逻辑
 }
 </script> 

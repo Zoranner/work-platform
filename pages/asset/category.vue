@@ -1,235 +1,315 @@
 <template>
+  <PageContainer>
+    <!-- 页面标题和操作按钮 -->
+    <PageHeader
+      title="类目管理"
+      :show-add-button="true"
+      add-button-text="新建类目"
+      @add="showAddDialog = true"
+    />
+
+    <!-- 搜索和筛选区域 -->
+    <SearchSection @search="handleSearch" @reset="handleReset">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">类目编号</label>
+        <input
+          type="text"
+          v-model="searchForm.categoryNumber"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">类目名称</label>
+        <input
+          type="text"
+          v-model="searchForm.name"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+        />
+      </div>
   <div>
-    <!-- 搜索表单 -->
-    <SearchForm @search="handleSearch" @reset="handleReset">
+        <label class="block text-sm font-medium text-gray-700">状态</label>
+        <select
+          v-model="searchForm.status"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+        >
+          <option value="">全部</option>
+          <option value="active">启用</option>
+          <option value="disabled">禁用</option>
+        </select>
+      </div>
+    </SearchSection>
+
+    <!-- 类目列表 -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">类目编号</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">类目名称</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">描述</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">创建时间</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr v-for="category in categoryList" :key="category.id">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ category.categoryNumber }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ category.name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ category.description }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ category.createdAt }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <StatusTag :status="getStatusType(category.status)" :text="getStatusText(category.status)" />
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <TableActions
+                size="sm"
+                :actions="[
+                  {
+                    key: 'edit',
+                    text: '编辑',
+                    type: 'primary',
+                    onClick: () => handleEdit(category)
+                  },
+                  {
+                    key: 'delete',
+                    text: '删除',
+                    type: 'danger',
+                    onClick: () => handleDelete(category)
+                  }
+                ]"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 分页 -->
+    <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+      <Pagination
+        :current-page="currentPage"
+        :total="total"
+        :page-size="pageSize"
+        @update:current-page="handlePageChange"
+      />
+    </div>
+  </PageContainer>
+
+  <!-- 新增/编辑对话框 -->
+  <Modal v-model:visible="showAddDialog" :title="editingCategory ? '编辑类目' : '新建类目'">
+    <div class="space-y-4">
       <FormInput
-        v-model="searchForm.categoryNo"
+        v-model="categoryForm.categoryNumber"
         label="类目编号"
         placeholder="请输入类目编号"
+        :disabled="!!editingCategory"
       />
       <FormInput
-        v-model="searchForm.name"
+        v-model="categoryForm.name"
         label="类目名称"
         placeholder="请输入类目名称"
       />
-      <FormSelect
-        v-model="searchForm.status"
-        label="状态"
-        :options="statusOptions"
-        placeholder="全部"
+      <FormInput
+        type="textarea"
+        v-model="categoryForm.description"
+        label="描述"
+        placeholder="请输入类目描述"
       />
-    </SearchForm>
-
-    <!-- 表格 -->
-    <Card class="mt-6">
-      <template #header>
-        <div class="flex justify-between items-center">
-          <h3 class="text-lg font-medium text-gray-900">类目列表</h3>
-          <Button type="primary" @click="openDialog()">新增类目</Button>
-        </div>
-      </template>
-      <div class="overflow-x-auto">
-        <Table :columns="columns" :data="categoryStore.categories" :loading="categoryStore.loading" />
-      </div>
-    </Card>
-
-    <!-- 新增/编辑对话框 -->
-    <Modal v-model:visible="dialogVisible" :title="dialogTitle">
-      <div class="space-y-4">
-        <FormInput
-          v-model="formData.categoryNo"
-          label="类目编号"
-          placeholder="请输入类目编号"
-          :disabled="!!editingRecord"
-        />
-        <FormInput
-          v-model="formData.name"
-          label="类目名称"
-          placeholder="请输入类目名称"
-        />
-        <FormTextarea
-          v-model="formData.description"
-          label="描述"
-          placeholder="请输入类目描述"
-          :rows="3"
-        />
-        <FormSelect
-          v-model="formData.status"
-          label="状态"
-          :options="statusOptions"
+      <FormSelect
+        v-model="categoryForm.status"
+        label="状态"
+        :options="[
+          { label: '启用', value: 'active' },
+          { label: '禁用', value: 'disabled' }
+        ]"
         />
       </div>
       <template #footer>
         <div class="flex justify-end space-x-3">
           <Button @click="closeDialog">取消</Button>
-          <Button type="primary" @click="handleSubmit">确定</Button>
+        <Button type="primary" @click="handleSave">确定</Button>
         </div>
       </template>
     </Modal>
+
+  <!-- 删除确认对话框 -->
+  <Modal v-model:visible="showDeleteDialog" title="确认删除">
+    <div class="mt-2">
+      <p class="text-sm text-gray-500">
+        确定要删除该类目吗？此操作无法撤销。
+      </p>
+    </div>
+    <template #footer>
+      <div class="flex justify-end space-x-3">
+        <Button @click="showDeleteDialog = false">取消</Button>
+        <Button type="danger" @click="handleConfirmDelete">删除</Button>
   </div>
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, h, onMounted } from 'vue'
-import type { Category, CategoryForm, CategorySearchForm } from '~/types/asset'
-import { useCategoryStore } from '~/stores/category'
+import { ref } from 'vue'
 import Button from '~/components/ui/Button.vue'
 import Table from '~/components/table/Table.vue'
 import StatusTag from '~/components/ui/StatusTag.vue'
 import Modal from '~/components/ui/Modal.vue'
-import Card from '~/components/ui/Card.vue'
 import FormInput from '~/components/ui/FormInput.vue'
 import FormSelect from '~/components/ui/FormSelect.vue'
-import FormTextarea from '~/components/ui/FormTextarea.vue'
-import SearchForm from '~/components/search/SearchForm.vue'
+import Pagination from '~/components/ui/Pagination.vue'
 import TableActions from '~/components/table/TableActions.vue'
+import PageContainer from '~/components/page/PageContainer.vue'
+import PageHeader from '~/components/page/PageHeader.vue'
+import SearchSection from '~/components/page/SearchSection.vue'
 
 definePageMeta({
   middleware: ['auth'],
   layout: 'admin'
 })
 
-const categoryStore = useCategoryStore()
-
-// 搜索表单数据
-const searchForm = ref<CategorySearchForm>({
-  categoryNo: '',
+// 搜索表单
+const searchForm = ref({
+  categoryNumber: '',
   name: '',
   status: ''
 })
 
-// 状态选项
-const statusOptions = [
-  { label: '启用', value: 'active' },
-  { label: '禁用', value: 'inactive' }
-]
-
-// 获取状态文本
-const getStatusText = (status: string) => {
-  return statusOptions.find(option => option.value === status)?.label || status
-}
-
-// 表格列定义
-const columns = [
-  { title: '类目编号', key: 'categoryNo' },
-  { title: '类目名称', key: 'name' },
-  { title: '描述', key: 'description' },
-  { title: '创建时间', key: 'createdAt' },
-  { 
-    title: '状态', 
-    key: 'status',
-    render: (record: Category) => h(StatusTag, { 
-      status: record.status === 'active' ? 'normal' : 'damaged',
-      text: getStatusText(record.status)
-    })
-  },
-  { 
-    title: '操作', 
-    key: 'action', 
-    width: 200,
-    render: (record: Category) => h(TableActions, { 
-      size: 'sm',
-      actions: [
-        {
-          key: 'edit',
-          text: '编辑',
-          type: 'primary',
-          onClick: () => openDialog(record)
-        },
-        {
-          key: 'delete',
-          text: '删除',
-          type: 'danger',
-          onClick: () => handleDelete(record)
-        }
-      ]
-    })
-  }
-]
-
-// 新增/编辑对话框
-const dialogVisible = ref(false)
-const editingRecord = ref<Category | null>(null)
-const dialogTitle = computed(() => editingRecord.value ? '编辑类目' : '新增类目')
-
-const formData = ref<CategoryForm>({
-  categoryNo: '',
+// 类目表单
+const categoryForm = ref({
+  categoryNumber: '',
   name: '',
   description: '',
   status: 'active'
 })
 
-// 打开对话框
-const openDialog = (record: Category | null = null) => {
-  editingRecord.value = record
-  if (record) {
-    const { id, createdAt, updatedAt, ...rest } = record
-    formData.value = { ...rest }
-  } else {
-    formData.value = {
-      categoryNo: '',
-      name: '',
-      description: '',
-      status: 'active'
-    }
+// 列表数据
+const categoryList = ref([
+  {
+    id: 1,
+    categoryNumber: 'CAT001',
+    name: '办公设备',
+    description: '办公室常用设备',
+    createdAt: '2024-01-01',
+    status: 'active'
+  },
+  {
+    id: 2,
+    categoryNumber: 'CAT002',
+    name: '网络设备',
+    description: '网络相关设备',
+    createdAt: '2024-01-15',
+    status: 'disabled'
   }
-  dialogVisible.value = true
+])
+
+// 分页相关
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(20)
+
+// 对话框控制
+const showAddDialog = ref(false)
+const showDeleteDialog = ref(false)
+const editingCategory = ref<any>(null)
+const deletingCategory = ref<any>(null)
+
+// 获取状态类型
+const getStatusType = (status: string) => {
+  const statusMap: Record<string, 'normal' | 'warning' | 'success' | 'error'> = {
+    active: 'success',
+    disabled: 'error'
+  }
+  return statusMap[status] || 'normal'
+}
+
+// 获取状态文本
+const getStatusText = (status: string) => {
+  const statusMap: Record<string, string> = {
+    active: '启用',
+    disabled: '禁用'
+  }
+  return statusMap[status] || status
+}
+
+// 搜索
+const handleSearch = () => {
+  // TODO: 实现搜索逻辑
+  console.log('搜索条件:', searchForm.value)
+}
+
+// 重置搜索
+const handleReset = () => {
+  searchForm.value = {
+    categoryNumber: '',
+    name: '',
+    status: ''
+  }
+}
+
+// 编辑类目
+const handleEdit = (category: any) => {
+  editingCategory.value = category
+  categoryForm.value = { ...category }
+  showAddDialog.value = true
+}
+
+// 删除类目
+const handleDelete = (category: any) => {
+  deletingCategory.value = category
+  showDeleteDialog.value = true
+}
+
+// 确认删除
+const handleConfirmDelete = () => {
+  if (deletingCategory.value) {
+    // TODO: 实现删除逻辑
+    console.log('删除类目:', deletingCategory.value)
+    categoryList.value = categoryList.value.filter(item => item.id !== deletingCategory.value.id)
+    showDeleteDialog.value = false
+    deletingCategory.value = null
+  }
+}
+
+// 保存类目
+const handleSave = () => {
+  // TODO: 实现保存逻辑
+  if (editingCategory.value) {
+    // 编辑模式
+    const index = categoryList.value.findIndex(item => item.id === editingCategory.value.id)
+    if (index !== -1) {
+      categoryList.value[index] = {
+        ...categoryList.value[index],
+        ...categoryForm.value
+      }
+    }
+  } else {
+    // 新增模式
+    const newCategory = {
+      id: Date.now(),
+      createdAt: new Date().toISOString().split('T')[0],
+      ...categoryForm.value
+    }
+    categoryList.value.unshift(newCategory)
+  }
+  closeDialog()
 }
 
 // 关闭对话框
 const closeDialog = () => {
-  dialogVisible.value = false
-  editingRecord.value = null
-  formData.value = {
-    categoryNo: '',
+  showAddDialog.value = false
+  editingCategory.value = null
+  categoryForm.value = {
+    categoryNumber: '',
     name: '',
     description: '',
     status: 'active'
   }
 }
 
-// 提交表单
-const handleSubmit = async () => {
-  try {
-    if (editingRecord.value) {
-      await categoryStore.updateCategory(editingRecord.value.id, formData.value)
-    } else {
-      await categoryStore.createCategory(formData.value)
-    }
-    closeDialog()
-  } catch (error) {
-    console.error('提交表单失败:', error)
-  }
+// 分页操作
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  // TODO: 实现分页加载逻辑
 }
-
-// 删除记录
-const handleDelete = async (record: Category) => {
-  try {
-    await categoryStore.deleteCategory(record.id)
-  } catch (error) {
-    console.error('删除记录失败:', error)
-  }
-}
-
-// 搜索
-const handleSearch = () => {
-  categoryStore.setSearchForm(searchForm.value)
-  categoryStore.fetchCategories()
-}
-
-// 重置搜索
-const handleReset = () => {
-  searchForm.value = {
-    categoryNo: '',
-    name: '',
-    status: ''
-  }
-  categoryStore.setSearchForm(searchForm.value)
-  categoryStore.fetchCategories()
-}
-
-// 初始化
-onMounted(() => {
-  categoryStore.fetchCategories()
-})
 </script> 
