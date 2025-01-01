@@ -23,26 +23,26 @@
 
           <!-- 登录按钮 -->
           <div class="space-y-4">
-            <button
+            <UiButton
               @click="handleOIDCLogin"
-              class="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200"
+              type="primary"
+              size="lg"
+              block
             >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-              </svg>
+              <IconsLoginIcon class="w-5 h-5 mr-2" />
               OIDC 登录
-            </button>
+            </UiButton>
 
             <!-- 测试按钮 -->
-            <button
+            <UiButton
               @click="handleTestLogin"
-              class="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
+              type="success"
+              size="lg"
+              block
             >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <IconsCheckCircleIcon class="w-5 h-5 mr-2" />
               测试登录
-            </button>
+            </UiButton>
           </div>
 
           <!-- 底部提示 -->

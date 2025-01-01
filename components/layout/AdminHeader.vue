@@ -9,11 +9,9 @@
       <!-- 右侧用户信息和操作 -->
       <div class="flex items-center space-x-4">
         <!-- 通知铃铛 -->
-        <button class="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-        </button>
+        <UiButton type="secondary" size="sm" class="!p-2">
+          <IconsBellIcon class="w-6 h-6" />
+        </UiButton>
 
         <!-- 用户头像和下拉菜单 -->
         <div class="relative" @click="toggleUserMenu" v-click-outside="closeUserMenu">
@@ -22,17 +20,20 @@
               {{ authStore.currentUser?.name?.[0] || 'U' }}
             </div>
             <span class="text-sm font-medium text-gray-700">{{ authStore.currentUser?.name || '用户' }}</span>
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
+            <IconsChevronDownIcon class="w-4 h-4 text-gray-500" />
           </button>
 
           <!-- 用户菜单 -->
           <div v-show="showUserMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
             <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">个人设置</a>
-            <button @click="handleLogout" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+            <UiButton 
+              @click="handleLogout" 
+              type="danger" 
+              size="sm"
+              class="w-full !justify-start !rounded-none !shadow-none"
+            >
               退出登录
-            </button>
+            </UiButton>
           </div>
         </div>
       </div>

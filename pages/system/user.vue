@@ -157,8 +157,8 @@
     </div>
     <template #footer>
       <div class="flex justify-end space-x-3">
-        <Button @click="closeDialog">取消</Button>
-        <Button type="primary" @click="handleSave">确定</Button>
+        <UiButton @click="closeDialog">取消</UiButton>
+        <UiButton type="primary" @click="handleSave">确定</UiButton>
       </div>
     </template>
   </Modal>
@@ -172,8 +172,8 @@
     </div>
     <template #footer>
       <div class="flex justify-end space-x-3">
-        <Button @click="showDeleteDialog = false">取消</Button>
-        <Button type="danger" @click="handleConfirmDelete">删除</Button>
+        <UiButton @click="showDeleteDialog = false">取消</UiButton>
+        <UiButton type="danger" @click="handleConfirmDelete">删除</UiButton>
       </div>
     </template>
   </Modal>
@@ -181,7 +181,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import Button from '~/components/ui/Button.vue'
 import Table from '~/components/table/Table.vue'
 import StatusTag from '~/components/ui/StatusTag.vue'
 import Modal from '~/components/ui/Modal.vue'

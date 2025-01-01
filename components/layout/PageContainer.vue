@@ -22,10 +22,11 @@ const handleBack = () => {
     <!-- 页面标题和操作按钮 -->
     <div class="flex justify-between items-center">
       <div class="flex items-center space-x-2">
-        <button
+        <UiButton
           v-if="showBack"
           @click="handleBack"
-          class="text-gray-600 hover:text-gray-900"
+          type="secondary"
+          size="sm"
         >
           <svg
             class="h-5 w-5"
@@ -39,7 +40,7 @@ const handleBack = () => {
               clip-rule="evenodd"
             />
           </svg>
-        </button>
+        </UiButton>
         <h2 class="text-xl font-semibold text-gray-800">{{ title }}</h2>
       </div>
       <div class="flex items-center space-x-2">
