@@ -60,12 +60,37 @@
         :columns="columns"
         :data="deviceList"
         :loading="loading"
+        :selection="true"
+        :selected-keys="selectedDeviceKeys"
+        :toolbar="true"
+        :toolbar-actions="[
+          {
+            key: 'export',
+            text: '导出',
+            type: 'default',
+            onClick: handleExport
+          },
+          {
+            key: 'batchDelete',
+            text: '批量删除',
+            type: 'danger',
+            onClick: handleBatchDelete
+          }
+        ]"
+        hover
+        striped
+        @update:selected-keys="handleSelectionChange"
+        @sort="handleSort"
+      />
+    </div>
+
+    <!-- 分页 -->
+    <div class="mt-4 flex justify-end">
+      <Pagination
         :current-page="currentPage"
         :total="total"
         :page-size="pageSize"
         @update:current-page="handlePageChange"
-        hover
-        striped
       />
     </div>
   </PageContainer>
@@ -311,32 +336,30 @@
     // TODO: 实现分页加载逻辑
   };
 
-  // 添加 loading 状态
-  const loading = ref(false);
-
-  // 定义表格列配置
+  // 表格列定义
   const columns = [
     {
       key: 'deviceNumber',
       title: '设备编号',
-      className: 'text-gray-900 font-medium'
+      sortable: true
     },
     {
       key: 'name',
-      title: '设备名称'
+      title: '设备名称',
+      sortable: true
     },
     {
-      key: 'type',
-      title: '设备类型',
-      render: (row: any) => getTypeText(row.type)
+      key: 'category',
+      title: '设备类型'
     },
     {
-      key: 'model',
-      title: '型号'
+      key: 'location',
+      title: '存放位置'
     },
     {
       key: 'purchaseDate',
-      title: '购入日期'
+      title: '购入日期',
+      sortable: true
     },
     {
       key: 'status',
@@ -349,7 +372,7 @@
     {
       key: 'actions',
       title: '操作',
-      width: '160px',
+      width: 200,
       render: (row: any) => h(TableActions, {
         size: 'sm',
         actions: [
@@ -369,4 +392,34 @@
       })
     }
   ];
+
+  const loading = ref(false);
+  const selectedDeviceKeys = ref<string[]>([]);
+
+  // 处理选择变化
+  const handleSelectionChange = (keys: string[]) => {
+    selectedDeviceKeys.value = keys;
+  };
+
+  // 处理排序
+  const handleSort = (key: string, order: 'asc' | 'desc') => {
+    // TODO: 实现排序逻辑
+    console.log('排序:', key, order);
+  };
+
+  // 处理导出
+  const handleExport = () => {
+    // TODO: 实现导出逻辑
+    console.log('导出选中的设备:', selectedDeviceKeys.value);
+  };
+
+  // 处理批量删除
+  const handleBatchDelete = () => {
+    if (selectedDeviceKeys.value.length === 0) {
+      // TODO: 显示提示
+      return;
+    }
+      // TODO: 实现批量删除逻辑
+      console.log('批量删除设备:', selectedDeviceKeys.value);
+  };
 </script>

@@ -48,94 +48,33 @@
     </SearchSection>
 
     <!-- 用户列表 -->
-    <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              用户名
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              姓名
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              部门
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              角色
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              邮箱
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              状态
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              操作
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="user in userList" :key="user.id">
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-              {{ user.username }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.name }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.department }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.role }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.email }}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <StatusTag :status="getStatusType(user.status)" :text="getStatusText(user.status)" />
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <TableActions
-                size="sm"
-                :actions="[
-                  {
-                    key: 'edit',
-                    text: '编辑',
-                    type: 'primary',
-                    onClick: () => handleEdit(user),
-                  },
-                  {
-                    key: 'delete',
-                    text: '删除',
-                    type: 'danger',
-                    onClick: () => handleDelete(user),
-                  },
-                ]"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <Table
+      :columns="columns"
+      :data="userList"
+      :loading="loading"
+      :selection="true"
+      :selected-keys="selectedUserKeys"
+      :toolbar="true"
+      :toolbar-actions="[
+        {
+          key: 'export',
+          text: '导出',
+          type: 'default',
+          onClick: handleExport
+        },
+        {
+          key: 'batchDelete',
+          text: '批量删除',
+          type: 'danger',
+          onClick: handleBatchDelete
+        }
+      ]"
+      @update:selected-keys="handleSelectionChange"
+      @sort="handleSort"
+    />
 
     <!-- 分页 -->
-    <div
-      class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
-    >
+    <div class="mt-4 flex justify-end">
       <Pagination
         :current-page="currentPage"
         :total="total"
@@ -375,5 +314,91 @@
   const handlePageChange = (page: number) => {
     currentPage.value = page;
     // TODO: 实现分页加载逻辑
+  };
+
+  // 表格列定义
+  const columns = [
+    {
+      key: 'username',
+      title: '用户名',
+      sortable: true
+    },
+    {
+      key: 'name',
+      title: '姓名',
+      sortable: true
+    },
+    {
+      key: 'department',
+      title: '部门'
+    },
+    {
+      key: 'role',
+      title: '角色'
+    },
+    {
+      key: 'email',
+      title: '邮箱'
+    },
+    {
+      key: 'status',
+      title: '状态',
+      render: (row: any) => h(StatusTag, {
+        status: getStatusType(row.status),
+        text: getStatusText(row.status)
+      })
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      width: 200,
+      render: (row: any) => h(TableActions, {
+        size: 'sm',
+        actions: [
+          {
+            key: 'edit',
+            text: '编辑',
+            type: 'primary',
+            onClick: () => handleEdit(row)
+          },
+          {
+            key: 'delete',
+            text: '删除',
+            type: 'danger',
+            onClick: () => handleDelete(row)
+          }
+        ]
+      })
+    }
+  ];
+
+  const loading = ref(false);
+  const selectedUserKeys = ref<string[]>([]);
+
+  // 处理选择变化
+  const handleSelectionChange = (keys: string[]) => {
+    selectedUserKeys.value = keys;
+  };
+
+  // 处理排序
+  const handleSort = (key: string, order: 'asc' | 'desc') => {
+    // TODO: 实现排序逻辑
+    console.log('排序:', key, order);
+  };
+
+  // 处理导出
+  const handleExport = () => {
+    // TODO: 实现导出逻辑
+    console.log('导出选中的用户:', selectedUserKeys.value);
+  };
+
+  // 处理批量删除
+  const handleBatchDelete = () => {
+    if (selectedUserKeys.value.length === 0) {
+      // TODO: 显示提示
+      return;
+    }
+    // TODO: 实现批量删除逻辑
+    console.log('批量删除用户:', selectedUserKeys.value);
   };
 </script>

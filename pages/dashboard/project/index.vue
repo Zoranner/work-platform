@@ -55,12 +55,37 @@
         :columns="columns"
         :data="projectList"
         :loading="loading"
+        :selection="true"
+        :selected-keys="selectedProjectKeys"
+        :toolbar="true"
+        :toolbar-actions="[
+          {
+            key: 'export',
+            text: '导出',
+            type: 'default',
+            onClick: handleExport
+          },
+          {
+            key: 'batchDelete',
+            text: '批量删除',
+            type: 'danger',
+            onClick: handleBatchDelete
+          }
+        ]"
+        hover
+        striped
+        @update:selected-keys="handleSelectionChange"
+        @sort="handleSort"
+      />
+    </div>
+
+    <!-- 分页 -->
+    <div class="mt-4 flex justify-end">
+      <Pagination
         :current-page="currentPage"
         :total="total"
         :page-size="pageSize"
         @update:current-page="handlePageChange"
-        hover
-        striped
       />
     </div>
 
@@ -281,19 +306,17 @@
     // TODO: 实现分页加载逻辑
   };
 
-  // 添加 loading 状态
-  const loading = ref(false);
-
-  // 定义表格列配置
+  // 表格列定义
   const columns = [
     {
       key: 'projectNumber',
       title: '项目编号',
-      className: 'text-gray-900 font-medium'
+      sortable: true
     },
     {
       key: 'name',
-      title: '项目名称'
+      title: '项目名称',
+      sortable: true
     },
     {
       key: 'manager',
@@ -301,7 +324,8 @@
     },
     {
       key: 'startDate',
-      title: '开始日期'
+      title: '开始日期',
+      sortable: true
     },
     {
       key: 'status',
@@ -314,7 +338,7 @@
     {
       key: 'actions',
       title: '操作',
-      width: '160px',
+      width: 200,
       render: (row: any) => h(TableActions, {
         size: 'sm',
         actions: [
@@ -334,4 +358,34 @@
       })
     }
   ];
+
+  const loading = ref(false);
+  const selectedProjectKeys = ref<string[]>([]);
+
+  // 处理选择变化
+  const handleSelectionChange = (keys: string[]) => {
+    selectedProjectKeys.value = keys;
+  };
+
+  // 处理排序
+  const handleSort = (key: string, order: 'asc' | 'desc') => {
+    // TODO: 实现排序逻辑
+    console.log('排序:', key, order);
+  };
+
+  // 处理导出
+  const handleExport = () => {
+    // TODO: 实现导出逻辑
+    console.log('导出选中的项目:', selectedProjectKeys.value);
+  };
+
+  // 处理批量删除
+  const handleBatchDelete = () => {
+    if (selectedProjectKeys.value.length === 0) {
+      // TODO: 显示提示
+      return;
+    }
+      // TODO: 实现批量删除逻辑
+      console.log('批量删除项目:', selectedProjectKeys.value);
+  };
 </script>

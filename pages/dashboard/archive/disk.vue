@@ -60,12 +60,37 @@
         :columns="columns"
         :data="diskList"
         :loading="loading"
+        :selection="true"
+        :selected-keys="selectedDiskKeys"
+        :toolbar="true"
+        :toolbar-actions="[
+          {
+            key: 'export',
+            text: '导出',
+            type: 'default',
+            onClick: handleExport
+          },
+          {
+            key: 'batchDelete',
+            text: '批量删除',
+            type: 'danger',
+            onClick: handleBatchDelete
+          }
+        ]"
+        hover
+        striped
+        @update:selected-keys="handleSelectionChange"
+        @sort="handleSort"
+      />
+    </div>
+
+    <!-- 分页 -->
+    <div class="mt-4 flex justify-end">
+      <Pagination
         :current-page="currentPage"
         :total="total"
         :page-size="pageSize"
         @update:current-page="handlePageChange"
-        hover
-        striped
       />
     </div>
   </PageContainer>
@@ -326,33 +351,61 @@
   // 添加 loading 状态
   const loading = ref(false);
 
+  // 添加选择行数据
+  const selectedDiskKeys = ref<string[]>([]);
+
+  // 处理选择变化
+  const handleSelectionChange = (keys: string[]) => {
+    selectedDiskKeys.value = keys;
+  };
+
+  // 处理排序
+  const handleSort = (key: string, order: 'asc' | 'desc') => {
+    // TODO: 实现排序逻辑
+    console.log('排序:', key, order);
+  };
+
+  // 处理导出
+  const handleExport = () => {
+    // TODO: 实现导出逻辑
+    console.log('导出选中的盘点记录:', selectedDiskKeys.value);
+  };
+
+  // 处理批量删除
+  const handleBatchDelete = () => {
+    if (selectedDiskKeys.value.length === 0) {
+      // TODO: 显示提示
+      return;
+    }
+    // TODO: 实现批量删除逻辑
+    console.log('批量删除盘点记录:', selectedDiskKeys.value);
+  };
+
   // 定义表格列配置
   const columns = [
     {
       key: 'diskNumber',
-      title: '光盘编号',
-      className: 'text-gray-900 font-medium'
+      title: '盘点编号',
+      sortable: true
     },
     {
       key: 'name',
-      title: '光盘名称'
+      title: '盘点名称',
+      sortable: true
     },
     {
-      key: 'type',
-      title: '光盘类型',
-      render: (row: any) => getTypeText(row.type)
+      key: 'manager',
+      title: '负责人'
     },
     {
-      key: 'capacity',
-      title: '容量'
+      key: 'startDate',
+      title: '开始日期',
+      sortable: true
     },
     {
-      key: 'location',
-      title: '保管位置'
-    },
-    {
-      key: 'createdAt',
-      title: '创建时间'
+      key: 'endDate',
+      title: '结束日期',
+      sortable: true
     },
     {
       key: 'status',
@@ -365,7 +418,7 @@
     {
       key: 'actions',
       title: '操作',
-      width: '160px',
+      width: 200,
       render: (row: any) => h(TableActions, {
         size: 'sm',
         actions: [

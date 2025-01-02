@@ -53,18 +53,43 @@
       </div>
     </SearchSection>
 
-    <!-- 档案列表 -->
+    <!-- 纸质档案列表 -->
     <div class="overflow-x-auto">
       <Table
         :columns="columns"
         :data="paperList"
         :loading="loading"
+        :selection="true"
+        :selected-keys="selectedPaperKeys"
+        :toolbar="true"
+        :toolbar-actions="[
+          {
+            key: 'export',
+            text: '导出',
+            type: 'default',
+            onClick: handleExport
+          },
+          {
+            key: 'batchDelete',
+            text: '批量删除',
+            type: 'danger',
+            onClick: handleBatchDelete
+          }
+        ]"
+        hover
+        striped
+        @update:selected-keys="handleSelectionChange"
+        @sort="handleSort"
+      />
+    </div>
+
+    <!-- 分页 -->
+    <div class="mt-4 flex justify-end">
+      <Pagination
         :current-page="currentPage"
         :total="total"
         :page-size="pageSize"
         @update:current-page="handlePageChange"
-        hover
-        striped
       />
     </div>
   </PageContainer>
@@ -200,6 +225,9 @@
   const editingPaper = ref<any>(null);
   const deletingPaper = ref<any>(null);
 
+  // 添加选择行数据
+  const selectedRows = ref([]);
+  
   // 获取类型文本
   const getTypeText = (type: string) => {
     const typeMap: Record<string, string> = {
@@ -323,24 +351,25 @@
     {
       key: 'paperNumber',
       title: '档案编号',
-      className: 'text-gray-900 font-medium'
+      sortable: true
     },
     {
       key: 'name',
-      title: '档案名称'
+      title: '档案名称',
+      sortable: true
     },
     {
-      key: 'type',
-      title: '档案类型',
-      render: (row: any) => getTypeText(row.type)
+      key: 'category',
+      title: '档案类型'
     },
     {
       key: 'location',
-      title: '保管位置'
+      title: '存放位置'
     },
     {
-      key: 'createdAt',
-      title: '创建时间'
+      key: 'archiveDate',
+      title: '归档日期',
+      sortable: true
     },
     {
       key: 'status',
@@ -353,7 +382,7 @@
     {
       key: 'actions',
       title: '操作',
-      width: '160px',
+      width: 200,
       render: (row: any) => h(TableActions, {
         size: 'sm',
         actions: [
@@ -373,4 +402,33 @@
       })
     }
   ];
+
+  const selectedPaperKeys = ref<string[]>([]);
+
+  // 处理选择变化
+  const handleSelectionChange = (keys: string[]) => {
+    selectedPaperKeys.value = keys;
+  };
+
+  // 处理排序
+  const handleSort = (key: string, order: 'asc' | 'desc') => {
+    // TODO: 实现排序逻辑
+    console.log('排序:', key, order);
+  };
+
+  // 处理导出
+  const handleExport = () => {
+    // TODO: 实现导出逻辑
+    console.log('导出选中的档案:', selectedPaperKeys.value);
+  };
+
+  // 处理批量删除
+  const handleBatchDelete = () => {
+    if (selectedPaperKeys.value.length === 0) {
+      // TODO: 显示提示
+      return;
+    }
+      // TODO: 实现批量删除逻辑
+      console.log('批量删除档案:', selectedPaperKeys.value);
+  };
 </script>

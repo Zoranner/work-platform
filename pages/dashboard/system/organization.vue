@@ -49,94 +49,33 @@
       </SearchSection>
 
       <!-- 组织列表 -->
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                组织编号
-              </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                组织名称
-              </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                负责人
-              </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                联系电话
-              </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                创建时间
-              </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                状态
-              </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                操作
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="org in orgList" :key="org.id">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {{ org.orgNumber }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ org.name }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ org.manager }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ org.phone }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ org.createdAt }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <StatusTag :status="getStatusType(org.status)" :text="getStatusText(org.status)" />
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <TableActions
-                  size="sm"
-                  :actions="[
-                    {
-                      key: 'edit',
-                      text: '编辑',
-                      type: 'primary',
-                      onClick: () => handleEdit(org),
-                    },
-                    {
-                      key: 'delete',
-                      text: '删除',
-                      type: 'danger',
-                      onClick: () => handleDelete(org),
-                    },
-                  ]"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <Table
+        :columns="columns"
+        :data="orgList"
+        :loading="loading"
+        :selection="true"
+        :selected-keys="selectedOrgKeys"
+        :toolbar="true"
+        :toolbar-actions="[
+          {
+            key: 'export',
+            text: '导出',
+            type: 'default',
+            onClick: handleExport
+          },
+          {
+            key: 'batchDelete',
+            text: '批量删除',
+            type: 'danger',
+            onClick: handleBatchDelete
+          }
+        ]"
+        @update:selected-keys="handleSelectionChange"
+        @sort="handleSort"
+      />
 
       <!-- 分页 -->
-      <div
-        class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
-      >
+      <div class="mt-4 flex justify-end">
         <Pagination
           :current-page="currentPage"
           :total="total"
@@ -368,5 +307,92 @@
   const handlePageChange = (page: number) => {
     currentPage.value = page;
     // TODO: 实现分页加载逻辑
+  };
+
+  // 表格列定义
+  const columns = [
+    {
+      key: 'orgNumber',
+      title: '组织编号',
+      sortable: true
+    },
+    {
+      key: 'name',
+      title: '组织名称',
+      sortable: true
+    },
+    {
+      key: 'manager',
+      title: '负责人'
+    },
+    {
+      key: 'phone',
+      title: '联系电话'
+    },
+    {
+      key: 'createdAt',
+      title: '创建时间',
+      sortable: true
+    },
+    {
+      key: 'status',
+      title: '状态',
+      render: (row: any) => h(StatusTag, {
+        status: getStatusType(row.status),
+        text: getStatusText(row.status)
+      })
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      width: 200,
+      render: (row: any) => h(TableActions, {
+        size: 'sm',
+        actions: [
+          {
+            key: 'edit',
+            text: '编辑',
+            type: 'primary',
+            onClick: () => handleEdit(row)
+          },
+          {
+            key: 'delete',
+            text: '删除',
+            type: 'danger',
+            onClick: () => handleDelete(row)
+          }
+        ]
+      })
+    }
+  ];
+
+  const loading = ref(false);
+  const selectedOrgKeys = ref<string[]>([]);
+
+  // 处理选择变化
+  const handleSelectionChange = (keys: string[]) => {
+    selectedOrgKeys.value = keys;
+  };
+
+  // 处理排序
+  const handleSort = (key: string, order: 'asc' | 'desc') => {
+    // TODO: 实现排序逻辑
+    console.log('排序:', key, order);
+  };
+
+  // 处理导出
+  const handleExport = () => {
+    // TODO: 实现导出逻辑
+    console.log('导出选中的组织:', selectedOrgKeys.value);
+  };
+
+  // 处理批量删除
+  const handleBatchDelete = () => {
+    if (selectedOrgKeys.value.length === 0) {
+      // TODO: 显示提示
+      return;
+    }
+    // TODO: 实现批量删除逻辑
+    console.log('批量删除组织:', selectedOrgKeys.value);
   };
 </script>
