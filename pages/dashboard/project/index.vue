@@ -51,143 +51,63 @@
 
     <!-- 项目列表 -->
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              项目编号
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              项目名称
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              负责人
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              开始日期
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              状态
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              操作
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="project in projectList" :key="project.id">
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-              {{ project.projectNumber }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ project.name }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ project.manager }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ project.startDate }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <StatusTag
-                :status="getStatusType(project.status)"
-                :text="getStatusText(project.status)"
-              />
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <TableActions
-                size="sm"
-                :actions="[
-                  {
-                    key: 'edit',
-                    text: '编辑',
-                    type: 'primary',
-                    onClick: () => handleEdit(project),
-                  },
-                  {
-                    key: 'delete',
-                    text: '删除',
-                    type: 'danger',
-                    onClick: () => handleDelete(project),
-                  },
-                ]"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 分页 -->
-    <div
-      class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
-    >
-      <Pagination
+      <Table
+        :columns="columns"
+        :data="projectList"
+        :loading="loading"
         :current-page="currentPage"
         :total="total"
         :page-size="pageSize"
         @update:current-page="handlePageChange"
+        hover
+        striped
       />
     </div>
+
+    <!-- 新增/编辑对话框 -->
+    <Modal v-model:visible="showAddDialog" :title="editingProject ? '编辑项目' : '新建项目'">
+      <div class="space-y-4">
+        <FormInput
+          v-model="projectForm.projectNumber"
+          label="项目编号"
+          placeholder="请输入项目编号"
+          :disabled="!!editingProject"
+        />
+        <FormInput v-model="projectForm.name" label="项目名称" placeholder="请输入项目名称" />
+        <FormInput v-model="projectForm.manager" label="负责人" placeholder="请输入负责人" />
+        <FormInput type="date" v-model="projectForm.startDate" label="开始日期" />
+        <FormSelect
+          v-model="projectForm.status"
+          label="状态"
+          :options="[
+            { label: '规划中', value: 'planning' },
+            { label: '进行中', value: 'in_progress' },
+            { label: '已完成', value: 'completed' },
+            { label: '已暂停', value: 'suspended' },
+          ]"
+        />
+      </div>
+      <template #footer>
+        <div class="flex justify-end space-x-3">
+          <Button @click="closeDialog">取消</Button>
+          <Button type="primary" @click="handleSave">确定</Button>
+        </div>
+      </template>
+    </Modal>
+
+    <!-- 删除确认对话框 -->
+    <Modal v-model:visible="showDeleteDialog" title="确认删除">
+      <div class="mt-2">
+        <p class="text-sm text-gray-500">确定要删除该项目吗？此操作无法撤销。</p>
+      </div>
+      <template #footer>
+        <div class="flex justify-end space-x-3">
+          <Button @click="showDeleteDialog = false">取消</Button>
+          <Button type="danger" @click="handleConfirmDelete">删除</Button>
+        </div>
+      </template>
+    </Modal>
   </PageContainer>
-
-  <!-- 新增/编辑对话框 -->
-  <Modal v-model:visible="showAddDialog" :title="editingProject ? '编辑项目' : '新建项目'">
-    <div class="space-y-4">
-      <FormInput
-        v-model="projectForm.projectNumber"
-        label="项目编号"
-        placeholder="请输入项目编号"
-        :disabled="!!editingProject"
-      />
-      <FormInput v-model="projectForm.name" label="项目名称" placeholder="请输入项目名称" />
-      <FormInput v-model="projectForm.manager" label="负责人" placeholder="请输入负责人" />
-      <FormInput type="date" v-model="projectForm.startDate" label="开始日期" />
-      <FormSelect
-        v-model="projectForm.status"
-        label="状态"
-        :options="[
-          { label: '规划中', value: 'planning' },
-          { label: '进行中', value: 'in_progress' },
-          { label: '已完成', value: 'completed' },
-          { label: '已暂停', value: 'suspended' },
-        ]"
-      />
-    </div>
-    <template #footer>
-      <div class="flex justify-end space-x-3">
-        <Button @click="closeDialog">取消</Button>
-        <Button type="primary" @click="handleSave">确定</Button>
-      </div>
-    </template>
-  </Modal>
-
-  <!-- 删除确认对话框 -->
-  <Modal v-model:visible="showDeleteDialog" title="确认删除">
-    <div class="mt-2">
-      <p class="text-sm text-gray-500">确定要删除该项目吗？此操作无法撤销。</p>
-    </div>
-    <template #footer>
-      <div class="flex justify-end space-x-3">
-        <Button @click="showDeleteDialog = false">取消</Button>
-        <Button type="danger" @click="handleConfirmDelete">删除</Button>
-      </div>
-    </template>
-  </Modal>
 </template>
 
 <script setup lang="ts">
@@ -360,4 +280,58 @@
     currentPage.value = page;
     // TODO: 实现分页加载逻辑
   };
+
+  // 添加 loading 状态
+  const loading = ref(false);
+
+  // 定义表格列配置
+  const columns = [
+    {
+      key: 'projectNumber',
+      title: '项目编号',
+      className: 'text-gray-900 font-medium'
+    },
+    {
+      key: 'name',
+      title: '项目名称'
+    },
+    {
+      key: 'manager',
+      title: '负责人'
+    },
+    {
+      key: 'startDate',
+      title: '开始日期'
+    },
+    {
+      key: 'status',
+      title: '状态',
+      render: (row: any) => h(StatusTag, {
+        status: getStatusType(row.status),
+        text: getStatusText(row.status)
+      })
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      width: '160px',
+      render: (row: any) => h(TableActions, {
+        size: 'sm',
+        actions: [
+          {
+            key: 'edit',
+            text: '编辑',
+            type: 'primary',
+            onClick: () => handleEdit(row)
+          },
+          {
+            key: 'delete',
+            text: '删除',
+            type: 'danger',
+            onClick: () => handleDelete(row)
+          }
+        ]
+      })
+    }
+  ];
 </script>

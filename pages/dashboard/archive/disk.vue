@@ -56,107 +56,16 @@
 
     <!-- 光盘列表 -->
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              光盘编号
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              光盘名称
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              光盘类型
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              容量
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              保管位置
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              创建时间
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              状态
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              操作
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="disk in diskList" :key="disk.id">
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-              {{ disk.diskNumber }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ disk.name }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ getTypeText(disk.type) }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ disk.capacity }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ disk.location }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ disk.createdAt }}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <StatusTag :status="getStatusType(disk.status)" :text="getStatusText(disk.status)" />
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <TableActions
-                size="sm"
-                :actions="[
-                  {
-                    key: 'edit',
-                    text: '编辑',
-                    type: 'primary',
-                    onClick: () => handleEdit(disk),
-                  },
-                  {
-                    key: 'delete',
-                    text: '删除',
-                    type: 'danger',
-                    onClick: () => handleDelete(disk),
-                  },
-                ]"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 分页 -->
-    <div
-      class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
-    >
-      <Pagination
+      <Table
+        :columns="columns"
+        :data="diskList"
+        :loading="loading"
         :current-page="currentPage"
         :total="total"
         :page-size="pageSize"
         @update:current-page="handlePageChange"
+        hover
+        striped
       />
     </div>
   </PageContainer>
@@ -413,4 +322,67 @@
     currentPage.value = page;
     // TODO: 实现分页加载逻辑
   };
+
+  // 添加 loading 状态
+  const loading = ref(false);
+
+  // 定义表格列配置
+  const columns = [
+    {
+      key: 'diskNumber',
+      title: '光盘编号',
+      className: 'text-gray-900 font-medium'
+    },
+    {
+      key: 'name',
+      title: '光盘名称'
+    },
+    {
+      key: 'type',
+      title: '光盘类型',
+      render: (row: any) => getTypeText(row.type)
+    },
+    {
+      key: 'capacity',
+      title: '容量'
+    },
+    {
+      key: 'location',
+      title: '保管位置'
+    },
+    {
+      key: 'createdAt',
+      title: '创建时间'
+    },
+    {
+      key: 'status',
+      title: '状态',
+      render: (row: any) => h(StatusTag, {
+        status: getStatusType(row.status),
+        text: getStatusText(row.status)
+      })
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      width: '160px',
+      render: (row: any) => h(TableActions, {
+        size: 'sm',
+        actions: [
+          {
+            key: 'edit',
+            text: '编辑',
+            type: 'primary',
+            onClick: () => handleEdit(row)
+          },
+          {
+            key: 'delete',
+            text: '删除',
+            type: 'danger',
+            onClick: () => handleDelete(row)
+          }
+        ]
+      })
+    }
+  ];
 </script>

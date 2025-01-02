@@ -41,98 +41,16 @@
 
     <!-- 类目列表 -->
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              类目编号
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              类目名称
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              描述
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              创建时间
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              状态
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              操作
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="category in categoryList" :key="category.id">
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-              {{ category.categoryNumber }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ category.name }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ category.description }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ category.createdAt }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <StatusTag
-                :status="getStatusType(category.status)"
-                :text="getStatusText(category.status)"
-              />
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <TableActions
-                size="sm"
-                :actions="[
-                  {
-                    key: 'edit',
-                    text: '编辑',
-                    type: 'primary',
-                    onClick: () => handleEdit(category),
-                  },
-                  {
-                    key: 'delete',
-                    text: '删除',
-                    type: 'danger',
-                    onClick: () => handleDelete(category),
-                  },
-                ]"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 分页 -->
-    <div
-      class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
-    >
-      <Pagination
+      <Table
+        :columns="columns"
+        :data="categoryList"
+        :loading="loading"
         :current-page="currentPage"
         :total="total"
         :page-size="pageSize"
         @update:current-page="handlePageChange"
+        hover
+        striped
       />
     </div>
   </PageContainer>
@@ -349,4 +267,58 @@
     currentPage.value = page;
     // TODO: 实现分页加载逻辑
   };
+
+  // 添加 loading 状态
+  const loading = ref(false);
+
+  // 定义表格列配置
+  const columns = [
+    {
+      key: 'categoryNumber',
+      title: '类目编号',
+      className: 'text-gray-900 font-medium'
+    },
+    {
+      key: 'name',
+      title: '类目名称'
+    },
+    {
+      key: 'description',
+      title: '描述'
+    },
+    {
+      key: 'createdAt',
+      title: '创建时间'
+    },
+    {
+      key: 'status',
+      title: '状态',
+      render: (row: any) => h(StatusTag, {
+        status: getStatusType(row.status),
+        text: getStatusText(row.status)
+      })
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      width: '160px',
+      render: (row: any) => h(TableActions, {
+        size: 'sm',
+        actions: [
+          {
+            key: 'edit',
+            text: '编辑',
+            type: 'primary',
+            onClick: () => handleEdit(row)
+          },
+          {
+            key: 'delete',
+            text: '删除',
+            type: 'danger',
+            onClick: () => handleDelete(row)
+          }
+        ]
+      })
+    }
+  ];
 </script>

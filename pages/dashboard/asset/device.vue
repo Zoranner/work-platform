@@ -56,105 +56,16 @@
 
     <!-- 设备列表 -->
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              设备编号
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              设备名称
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              设备类型
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              型号
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              购入日期
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              状态
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              操作
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="device in deviceList" :key="device.id">
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-              {{ device.deviceNumber }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ device.name }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ getTypeText(device.type) }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ device.model }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ device.purchaseDate }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <StatusTag
-                :status="getStatusType(device.status)"
-                :text="getStatusText(device.status)"
-              />
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <TableActions
-                size="sm"
-                :actions="[
-                  {
-                    key: 'edit',
-                    text: '编辑',
-                    type: 'primary',
-                    onClick: () => handleEdit(device),
-                  },
-                  {
-                    key: 'delete',
-                    text: '删除',
-                    type: 'danger',
-                    onClick: () => handleDelete(device),
-                  },
-                ]"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 分页 -->
-    <div
-      class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
-    >
-      <Pagination
+      <Table
+        :columns="columns"
+        :data="deviceList"
+        :loading="loading"
         :current-page="currentPage"
         :total="total"
         :page-size="pageSize"
         @update:current-page="handlePageChange"
+        hover
+        striped
       />
     </div>
   </PageContainer>
@@ -399,4 +310,63 @@
     currentPage.value = page;
     // TODO: 实现分页加载逻辑
   };
+
+  // 添加 loading 状态
+  const loading = ref(false);
+
+  // 定义表格列配置
+  const columns = [
+    {
+      key: 'deviceNumber',
+      title: '设备编号',
+      className: 'text-gray-900 font-medium'
+    },
+    {
+      key: 'name',
+      title: '设备名称'
+    },
+    {
+      key: 'type',
+      title: '设备类型',
+      render: (row: any) => getTypeText(row.type)
+    },
+    {
+      key: 'model',
+      title: '型号'
+    },
+    {
+      key: 'purchaseDate',
+      title: '购入日期'
+    },
+    {
+      key: 'status',
+      title: '状态',
+      render: (row: any) => h(StatusTag, {
+        status: getStatusType(row.status),
+        text: getStatusText(row.status)
+      })
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      width: '160px',
+      render: (row: any) => h(TableActions, {
+        size: 'sm',
+        actions: [
+          {
+            key: 'edit',
+            text: '编辑',
+            type: 'primary',
+            onClick: () => handleEdit(row)
+          },
+          {
+            key: 'delete',
+            text: '删除',
+            type: 'danger',
+            onClick: () => handleDelete(row)
+          }
+        ]
+      })
+    }
+  ];
 </script>
