@@ -1,33 +1,9 @@
-<script setup lang="ts">
-interface Props {
-  title: string
-  showBack?: boolean
-  loading?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  showBack: false,
-  loading: false
-})
-
-const router = useRouter()
-
-const handleBack = () => {
-  router.back()
-}
-</script>
-
 <template>
   <div class="space-y-6">
     <!-- 页面标题和操作按钮 -->
     <div class="flex justify-between items-center">
       <div class="flex items-center space-x-2">
-        <UiButton
-          v-if="showBack"
-          @click="handleBack"
-          type="secondary"
-          size="sm"
-        >
+        <UiButton v-if="showBack" @click="handleBack" type="secondary" size="sm">
           <svg
             class="h-5 w-5"
             xmlns="http://www.w3.org/2000/svg"
@@ -77,4 +53,23 @@ const handleBack = () => {
       <slot />
     </template>
   </div>
-</template> 
+</template>
+
+<script setup lang="ts">
+  interface Props {
+    title: string;
+    showBack?: boolean;
+    loading?: boolean;
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    showBack: false,
+    loading: false,
+  });
+
+  const router = useRouter();
+
+  const handleBack = () => {
+    router.back();
+  };
+</script>

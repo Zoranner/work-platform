@@ -21,6 +21,6 @@
 </template>
 
 <script setup lang="ts">
-import AdminHeader from '~/components/layout/AdminHeader.vue'
-import AdminSidebar from '~/components/layout/AdminSidebar.vue'
-</script> 
+  import AdminHeader from '~/components/layout/AdminHeader.vue';
+  import AdminSidebar from '~/components/layout/AdminSidebar.vue';
+</script>

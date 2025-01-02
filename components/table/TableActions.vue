@@ -13,17 +13,17 @@
 </template>
 
 <script setup lang="ts">
-import Button from '~/components/ui/Button.vue'
+  import Button from '~/components/ui/Button.vue';
 
-interface Action {
-  key: string
-  text: string
-  type?: 'primary' | 'danger' | 'secondary' | 'warning' | 'success'
-  onClick: () => void
-}
+  interface Action {
+    key: string;
+    text: string;
+    type?: 'primary' | 'danger' | 'secondary' | 'warning' | 'success';
+    onClick: () => void;
+  }
 
-defineProps<{
-  actions: Action[]
-  size?: 'sm' | 'md' | 'lg'
-}>()
-</script> 
+  defineProps<{
+    actions: Action[];
+    size?: 'sm' | 'md' | 'lg';
+  }>();
+</script>

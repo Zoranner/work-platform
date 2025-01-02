@@ -13,15 +13,15 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  label?: string
-  modelValue: string
-  placeholder?: string
-  disabled?: boolean
-  rows?: number
-}>()
+  defineProps<{
+    label?: string;
+    modelValue: string;
+    placeholder?: string;
+    disabled?: boolean;
+    rows?: number;
+  }>();
 
-defineEmits<{
-  (e: 'update:modelValue', value: string): void
-}>()
-</script> 
+  defineEmits<{
+    (e: 'update:modelValue', value: string): void;
+  }>();
+</script>

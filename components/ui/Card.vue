@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  padding?: boolean
-}>()
-</script> 
+  defineProps<{
+    padding?: boolean;
+  }>();
+</script>

@@ -11,11 +11,11 @@
 </template>
 
 <script setup lang="ts">
-import Card from '~/components/ui/Card.vue'
-import Button from '~/components/ui/Button.vue'
+  import Card from '~/components/ui/Card.vue';
+  import Button from '~/components/ui/Button.vue';
 
-defineEmits<{
-  (e: 'search'): void
-  (e: 'reset'): void
-}>()
-</script> 
+  defineEmits<{
+    (e: 'search'): void;
+    (e: 'reset'): void;
+  }>();
+</script>

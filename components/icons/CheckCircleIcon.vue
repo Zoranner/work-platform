@@ -16,11 +16,11 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  className?: string
-}>()
+  defineProps<{
+    className?: string;
+  }>();
 
-defineOptions({
-  name: 'CheckCircleIcon'
-})
-</script> 
+  defineOptions({
+    name: 'CheckCircleIcon',
+  });
+</script>

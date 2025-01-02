@@ -8,20 +8,20 @@
       class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
       :placeholder="placeholder"
       :disabled="disabled"
-    >
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  label?: string
-  modelValue: string
-  type?: string
-  placeholder?: string
-  disabled?: boolean
-}>()
+  defineProps<{
+    label?: string;
+    modelValue: string;
+    type?: string;
+    placeholder?: string;
+    disabled?: boolean;
+  }>();
 
-defineEmits<{
-  (e: 'update:modelValue', value: string): void
-}>()
-</script> 
+  defineEmits<{
+    (e: 'update:modelValue', value: string): void;
+  }>();
+</script>

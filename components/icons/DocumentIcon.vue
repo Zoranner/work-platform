@@ -16,11 +16,11 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  className?: string
-}>()
+  defineProps<{
+    className?: string;
+  }>();
 
-defineOptions({
-  name: 'DocumentIcon'
-})
-</script> 
+  defineOptions({
+    name: 'DocumentIcon',
+  });
+</script>

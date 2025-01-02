@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-defineOptions({
-  name: 'PageContainer'
-})
-</script> 
+  defineOptions({
+    name: 'PageContainer',
+  });
+</script>

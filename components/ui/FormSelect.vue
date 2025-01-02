@@ -16,20 +16,20 @@
 </template>
 
 <script setup lang="ts">
-interface Option {
-  label: string
-  value: string | number
-}
+  interface Option {
+    label: string;
+    value: string | number;
+  }
 
-defineProps<{
-  label?: string
-  modelValue: string | number
-  options: Option[]
-  placeholder?: string
-  disabled?: boolean
-}>()
+  defineProps<{
+    label?: string;
+    modelValue: string | number;
+    options: Option[];
+    placeholder?: string;
+    disabled?: boolean;
+  }>();
 
-defineEmits<{
-  (e: 'update:modelValue', value: string): void
-}>()
-</script> 
+  defineEmits<{
+    (e: 'update:modelValue', value: string): void;
+  }>();
+</script>

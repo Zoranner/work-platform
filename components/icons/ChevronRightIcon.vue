@@ -14,11 +14,11 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  className?: string
-}>()
+  defineProps<{
+    className?: string;
+  }>();
 
-defineOptions({
-  name: 'ChevronRightIcon'
-})
-</script> 
+  defineOptions({
+    name: 'ChevronRightIcon',
+  });
+</script>

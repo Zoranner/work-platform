@@ -1,5 +1,7 @@
 <template>
-  <aside class="w-64 fixed left-0 bottom-0 top-[61px] bg-white border-r border-gray-200 overflow-y-auto">
+  <aside
+    class="w-64 fixed left-0 bottom-0 top-[61px] bg-white border-r border-gray-200 overflow-y-auto"
+  >
     <nav class="mt-4 px-4">
       <div class="space-y-8">
         <!-- 工作台 -->
@@ -10,7 +12,7 @@
             :class="[
               isRouteActive('/dashboard')
                 ? 'bg-primary-50 text-primary-600'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
             ]"
           >
             <IconsHomeIcon class="mr-3 h-6 w-6" />
@@ -24,12 +26,12 @@
             项目管理
           </div>
           <NuxtLink
-            to="/project"
+            to="/dashboard/project"
             class="flex items-center px-3 py-2 text-sm font-medium rounded-md"
             :class="[
               isRouteActive('/project')
                 ? 'bg-primary-100 text-primary-900'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
             ]"
           >
             <IconsDocumentIcon class="mr-3 h-6 w-6" />
@@ -44,24 +46,24 @@
           </h3>
           <div class="space-y-1">
             <NuxtLink
-              to="/archive/paper"
+              to="/dashboard/archive/paper"
               class="group flex items-center px-3 py-2 text-sm font-medium rounded-md"
               :class="[
                 isRouteActive('/archive/paper')
                   ? 'bg-primary-100 text-primary-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
               ]"
             >
               <IconsDocumentIcon class="mr-3 h-6 w-6" />
               <span class="truncate">纸质档案</span>
             </NuxtLink>
             <NuxtLink
-              to="/archive/disk"
+              to="/dashboard/archive/disk"
               class="group flex items-center px-3 py-2 text-sm font-medium rounded-md"
               :class="[
                 isRouteActive('/archive/disk')
                   ? 'bg-primary-100 text-primary-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
               ]"
             >
               <IconsDeviceIcon class="mr-3 h-6 w-6" />
@@ -76,24 +78,24 @@
             资产管理
           </div>
           <NuxtLink
-            to="/asset/device"
+            to="/dashboard/asset/device"
             class="flex items-center px-3 py-2 text-sm font-medium rounded-md"
             :class="[
               isRouteActive('/asset/device')
                 ? 'bg-primary-100 text-primary-900'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
             ]"
           >
             <IconsDeviceIcon class="mr-3 h-6 w-6" />
             设备管理
           </NuxtLink>
           <NuxtLink
-            to="/asset/category"
+            to="/dashboard/asset/category"
             class="flex items-center px-3 py-2 text-sm font-medium rounded-md"
             :class="[
               isRouteActive('/asset/category')
                 ? 'bg-primary-100 text-primary-900'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
             ]"
           >
             <IconsTagIcon class="mr-3 h-6 w-6" />
@@ -107,24 +109,24 @@
             系统管理
           </div>
           <NuxtLink
-            to="/system/user"
+            to="/dashboard/system/user"
             class="flex items-center px-3 py-2 text-sm font-medium rounded-md"
             :class="[
               isRouteActive('/system/user')
                 ? 'bg-primary-100 text-primary-900'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
             ]"
           >
             <IconsUserGroupIcon class="mr-3 h-6 w-6" />
             用户管理
           </NuxtLink>
           <NuxtLink
-            to="/system/organization"
+            to="/dashboard/system/organization"
             class="flex items-center px-3 py-2 text-sm font-medium rounded-md"
             :class="[
               isRouteActive('/system/organization')
                 ? 'bg-primary-100 text-primary-900'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
             ]"
           >
             <IconsBuildingIcon class="mr-3 h-6 w-6" />
@@ -137,13 +139,13 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
+  import { useAuthStore } from '~/stores/auth';
 
-const route = useRoute()
-const authStore = useAuthStore()
+  const route = useRoute();
+  const authStore = useAuthStore();
 
-// 判断路由是否激活
-const isRouteActive = (path: string) => {
-  return route.path.startsWith(path)
-}
-</script> 
+  // 判断路由是否激活
+  const isRouteActive = (path: string) => {
+    return route.path.startsWith(path);
+  };
+</script>

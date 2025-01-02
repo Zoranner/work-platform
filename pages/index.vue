@@ -8,17 +8,17 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
+  import { useAuthStore } from '~/stores/auth';
 
-const router = useRouter()
-const authStore = useAuthStore()
+  const router = useRouter();
+  const authStore = useAuthStore();
 
-// 在组件挂载时检查登录状态并重定向
-onMounted(() => {
-  if (authStore.isLoggedIn) {
-    router.push('/dashboard')
-  } else {
-    router.push('/login')
-  }
-})
-</script> 
+  // 在组件挂载时检查登录状态并重定向
+  onMounted(() => {
+    if (authStore.isLoggedIn) {
+      router.push('/dashboard');
+    } else {
+      router.push('/login');
+    }
+  });
+</script>

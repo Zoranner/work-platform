@@ -1,85 +1,85 @@
 <script setup lang="ts">
-interface Props {
-  currentPage: number
-  pageSize: number
-  total: number
-  showSizeChanger?: boolean
-  showQuickJumper?: boolean
-}
-
-interface Emits {
-  (e: 'update:currentPage', page: number): void
-  (e: 'update:pageSize', size: number): void
-  (e: 'change', page: number, pageSize: number): void
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  showSizeChanger: true,
-  showQuickJumper: true
-})
-
-const emit = defineEmits<Emits>()
-
-const totalPages = computed(() => Math.ceil(props.total / props.pageSize))
-
-const pageSizeOptions = [10, 20, 50, 100]
-
-const displayedPages = computed(() => {
-  const current = props.currentPage
-  const total = totalPages.value
-  const delta = 2
-  const range = []
-  const rangeWithDots = []
-  let l
-
-  range.push(1)
-
-  for (let i = current - delta; i <= current + delta; i++) {
-    if (i < total && i > 1) {
-      range.push(i)
-    }
+  interface Props {
+    currentPage: number;
+    pageSize: number;
+    total: number;
+    showSizeChanger?: boolean;
+    showQuickJumper?: boolean;
   }
 
-  if (total > 1) {
-    range.push(total)
+  interface Emits {
+    (e: 'update:currentPage', page: number): void;
+    (e: 'update:pageSize', size: number): void;
+    (e: 'change', page: number, pageSize: number): void;
   }
 
-  for (let i of range) {
-    if (l) {
-      if (i - l === 2) {
-        rangeWithDots.push(l + 1)
-      } else if (i - l !== 1) {
-        rangeWithDots.push('...')
+  const props = withDefaults(defineProps<Props>(), {
+    showSizeChanger: true,
+    showQuickJumper: true,
+  });
+
+  const emit = defineEmits<Emits>();
+
+  const totalPages = computed(() => Math.ceil(props.total / props.pageSize));
+
+  const pageSizeOptions = [10, 20, 50, 100];
+
+  const displayedPages = computed(() => {
+    const current = props.currentPage;
+    const total = totalPages.value;
+    const delta = 2;
+    const range = [];
+    const rangeWithDots = [];
+    let l;
+
+    range.push(1);
+
+    for (let i = current - delta; i <= current + delta; i++) {
+      if (i < total && i > 1) {
+        range.push(i);
       }
     }
-    rangeWithDots.push(i)
-    l = i
-  }
 
-  return rangeWithDots
-})
+    if (total > 1) {
+      range.push(total);
+    }
 
-const handlePageChange = (page: number | string) => {
-  if (typeof page === 'string' || page === props.currentPage) return
-  emit('update:currentPage', page)
-  emit('change', page, props.pageSize)
-}
+    for (let i of range) {
+      if (l) {
+        if (i - l === 2) {
+          rangeWithDots.push(l + 1);
+        } else if (i - l !== 1) {
+          rangeWithDots.push('...');
+        }
+      }
+      rangeWithDots.push(i);
+      l = i;
+    }
 
-const handlePageSizeChange = (event: Event) => {
-  const size = Number((event.target as HTMLSelectElement).value)
-  emit('update:pageSize', size)
-  emit('change', 1, size)
-}
+    return rangeWithDots;
+  });
 
-const jumpPage = ref('')
+  const handlePageChange = (page: number | string) => {
+    if (typeof page === 'string' || page === props.currentPage) return;
+    emit('update:currentPage', page);
+    emit('change', page, props.pageSize);
+  };
 
-const handleJumpPage = () => {
-  const page = Number(jumpPage.value)
-  if (page && page >= 1 && page <= totalPages.value) {
-    handlePageChange(page)
-    jumpPage.value = ''
-  }
-}
+  const handlePageSizeChange = (event: Event) => {
+    const size = Number((event.target as HTMLSelectElement).value);
+    emit('update:pageSize', size);
+    emit('change', 1, size);
+  };
+
+  const jumpPage = ref('');
+
+  const handleJumpPage = () => {
+    const page = Number(jumpPage.value);
+    if (page && page >= 1 && page <= totalPages.value) {
+      handlePageChange(page);
+      jumpPage.value = '';
+    }
+  };
 </script>
 
 <template>
@@ -119,11 +119,7 @@ const handleJumpPage = () => {
           @change="handlePageSizeChange"
           class="rounded-md border-gray-300 py-1 text-base focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
         >
-          <option
-            v-for="size in pageSizeOptions"
-            :key="size"
-            :value="size"
-          >
+          <option v-for="size in pageSizeOptions" :key="size" :value="size">
             {{ size }} 条/页
           </option>
         </select>
@@ -146,7 +142,7 @@ const handleJumpPage = () => {
               page === currentPage
                 ? 'z-10 bg-primary-50 border-primary-500 text-primary-600'
                 : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50',
-              page === '...' ? 'cursor-default' : ''
+              page === '...' ? 'cursor-default' : '',
             ]"
           >
             {{ page }}
@@ -170,10 +166,10 @@ const handleJumpPage = () => {
             :max="totalPages"
             @keyup.enter="handleJumpPage"
             class="w-16 rounded-md border-gray-300 py-1 text-base focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-          >
+          />
           <span class="text-sm text-gray-700">页</span>
         </div>
       </div>
     </div>
   </div>
-</template> 
+</template>
